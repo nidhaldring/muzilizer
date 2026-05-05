@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Wpedantic -lraylib
+CFLAGS = -Wall -Wextra -Wpedantic -lraylib -g
 
 SOURCE = src/*.c
 TARGET = muzilizer
