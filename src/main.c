@@ -18,7 +18,7 @@ int main() {
   InitWindow(WIDTH, HEIGHT, "muzilizer");
   SetTargetFPS(60);
   InitAudioDevice();
-  char *loadedFile = malloc(100);
+  char *loadedFile = NULL;
 
   while (!WindowShouldClose()) {
     BeginDrawing();
@@ -33,7 +33,18 @@ int main() {
         if (!loadedFile || strcmp(loadedFile, files.paths[0]) != 0) {
           printf("loaded file = %s\n", files.paths[0]);
           Sound s = LoadSound(files.paths[0]);
+
+          if (!loadedFile || strlen(files.paths[0]) > strlen(loadedFile)) {
+            void *tmp = realloc(loadedFile, strlen(files.paths[0]) + 1);
+            if (tmp == NULL) {
+              fprintf(stderr, "Memory Allocation error: realloc failed!\n");
+              exit(EXIT_FAILURE);
+            }
+            loadedFile = tmp;
+          }
+
           strcpy(loadedFile, files.paths[0]);
+          printf("saved file = %s\n", loadedFile);
         }
       }
 
