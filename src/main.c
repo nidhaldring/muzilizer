@@ -19,21 +19,16 @@ int main() {
   SetTargetFPS(60);
   InitAudioDevice();
   char *loadedFile = NULL;
+  const char *warning = NULL;
 
   while (!WindowShouldClose()) {
-    BeginDrawing();
-
-    ClearBackground(BLACK);
 
     if (IsFileDropped()) {
       FilePathList files = LoadDroppedFiles();
       if (files.count > 1) {
-        drawWarning("Only one file is supported for now!");
+        warning = "Only one file is supported for now!";
       } else {
         if (!loadedFile || strcmp(loadedFile, files.paths[0]) != 0) {
-          printf("loaded file = %s\n", files.paths[0]);
-          Sound s = LoadSound(files.paths[0]);
-
           if (!loadedFile || strlen(files.paths[0]) > strlen(loadedFile)) {
             void *tmp = realloc(loadedFile, strlen(files.paths[0]) + 1);
             if (tmp == NULL) {
@@ -42,13 +37,30 @@ int main() {
             }
             loadedFile = tmp;
           }
-
           strcpy(loadedFile, files.paths[0]);
-          printf("saved file = %s\n", loadedFile);
+
+          Wave w = LoadWave(loadedFile);
+          if (w.frameCount == 0 || w.channels == 0) {
+            warning = "File not supported!";
+          } else {
+            warning = NULL;
+            float *d = (float *)w.data;
+            for (int i = 0; i < w.channels * w.frameCount; i++) {
+              printf("%f |", d[i]);
+            }
+            printf("\n");
+          }
         }
       }
 
       UnloadDroppedFiles(files);
+    }
+
+    BeginDrawing();
+    ClearBackground(BLACK);
+
+    if (warning != NULL) {
+      drawWarning(warning);
     }
 
     EndDrawing();
